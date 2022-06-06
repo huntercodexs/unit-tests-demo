@@ -2,24 +2,19 @@ package com.huntercodexs.unittestsdemo.service;
 
 import com.huntercodexs.unittestsdemo.dto.request.UserRequestDto;
 import com.huntercodexs.unittestsdemo.dto.response.UserResponseDto;
+import com.huntercodexs.unittestsdemo.external.ExternalUserResponseDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import static com.huntercodexs.unittestsdemo.mapper.response.ExternalUserResponseMapper.*;
 import static com.huntercodexs.unittestsdemo.mapper.response.UserResponseMapper.*;
 
 @Service
-public class UserService {
+public class ExternalUserService {
 
-    public boolean testBool(String val) {
-        return !val.equals("false");
-    }
-
-    public String testString(String text) {
-        if (text.isEmpty()) {
-            return "The string is empty";
-        }
-        return "The string is: "+ text;
-    }
+    @Autowired
+    ClientService clientService;
 
     private boolean isUpdate(UserRequestDto userRequestDto) {
         try {
@@ -49,33 +44,33 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<UserResponseDto> one(String id) {
-        return ResponseEntity.ok().body(mapperResponseUserIdDto());
+    public ResponseEntity<ExternalUserResponseDto> one(String id) {
+        return ResponseEntity.ok().body(mapperExternalResponseUserIdDto(clientService.findUserById(id)));
     }
 
     public ResponseEntity<?> all() {
-        return ResponseEntity.ok().body(mapperResponseUsersDto());
+        return ResponseEntity.ok().body(mapperExternalResponseUsersDto(clientService.findUsers()));
     }
 
-    public ResponseEntity<UserResponseDto> create(UserRequestDto userRequestDto) {
-        return ResponseEntity.ok().body(mapperResponseCreateUserDto(userRequestDto));
+    public ResponseEntity<ExternalUserResponseDto> create(UserRequestDto userRequestDto) {
+        return ResponseEntity.ok().body(mapperExternalResponseCreateUserDto(clientService.createUser(userRequestDto)));
     }
 
-    public ResponseEntity<UserResponseDto> delete(String id) {
-        return ResponseEntity.ok().body(mapperResponseDeleteUserDto());
+    public ResponseEntity<ExternalUserResponseDto> delete(String id) {
+        return ResponseEntity.ok().body(mapperExternalResponseDeleteUserDto(clientService.deleteUserById(id)));
     }
 
-    public ResponseEntity<UserResponseDto> update(String id, UserRequestDto userRequestDto) {
+    public ResponseEntity<ExternalUserResponseDto> update(String id, UserRequestDto userRequestDto) {
         if (!isUpdate(userRequestDto)) {
             throw new RuntimeException("Request is not an update !");
         }
-        return ResponseEntity.ok().body(mapperResponseUpdateUserDto(userRequestDto));
+        return ResponseEntity.ok().body(mapperExternalResponseUpdateUserDto(clientService.updateUserById(id, userRequestDto)));
     }
 
-    public ResponseEntity<UserResponseDto> patch(String id, UserRequestDto userRequestDto) {
+    public ResponseEntity<ExternalUserResponseDto> patch(String id, UserRequestDto userRequestDto) {
         if (!isPatch(userRequestDto)) {
             throw new RuntimeException("Request is not an patch !");
         }
-        return ResponseEntity.ok().body(mapperResponsePatchUserDto(userRequestDto));
+        return ResponseEntity.ok().body(mapperExternalResponsePatchUserDto(clientService.patchUserById(id, userRequestDto)));
     }
 }

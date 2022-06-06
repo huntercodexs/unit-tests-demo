@@ -24,9 +24,9 @@ public class UserController {
      */
     @GetMapping(path = "/users/{id}")
     @ResponseBody
-    public ResponseEntity<UserResponseDto> one(@Valid @RequestBody UserRequestDto userRequestDto, @PathVariable("id") String id) {
+    public ResponseEntity<UserResponseDto> one(@PathVariable("id") String id) {
         log.info("GET Index Users id is calling");
-        return userService.one(id, userRequestDto);
+        return userService.one(id);
     }
 
     /**
@@ -34,9 +34,9 @@ public class UserController {
      */
     @GetMapping(path = "/users")
     @ResponseBody
-    public ResponseEntity<UserResponseDto> all(@Valid @RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity<?> all() {
         log.info("GET Index Users All is calling");
-        return userService.all(userRequestDto);
+        return userService.all();
     }
 
     /**
@@ -54,9 +54,9 @@ public class UserController {
      */
     @DeleteMapping(path = "/users/{id}")
     @ResponseBody
-    public ResponseEntity<UserResponseDto> delete(@Valid @RequestBody UserRequestDto userRequestDto, @PathVariable("id") String id) {
+    public ResponseEntity<UserResponseDto> delete(@PathVariable("id") String id) {
         log.info("DELETE Index id Users is calling");
-        return userService.delete(id, userRequestDto);
+        return userService.delete(id);
     }
 
     /**
@@ -64,9 +64,12 @@ public class UserController {
      */
     @PutMapping(path = "/users/{id}")
     @ResponseBody
-    public ResponseEntity<UserResponseDto> update(@Valid @RequestBody UserRequestDto user, @PathVariable("id") String id) {
+    public ResponseEntity<UserResponseDto> update(
+            @Valid @RequestBody(required = true) UserRequestDto userRequestDto,
+            @PathVariable("id") String id
+    ) {
         log.info("PUT Index id Users is calling");
-        return userService.update(id, user);
+        return userService.update(id, userRequestDto);
     }
 
     /**
@@ -74,9 +77,12 @@ public class UserController {
      */
     @PatchMapping(path = "/users/{id}")
     @ResponseBody
-    public ResponseEntity<UserResponseDto> patch(@Valid @RequestBody UserRequestDto userResponseDto, @PathVariable("id") String id) {
+    public ResponseEntity<UserResponseDto> patch(
+            @Valid @RequestBody(required = false) UserRequestDto userRequestDto,
+            @PathVariable("id") String id
+    ) {
         log.info("PATCH Index id Users is calling");
-        return userService.patch(id, userResponseDto);
+        return userService.patch(id, userRequestDto);
     }
 
 }

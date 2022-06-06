@@ -12,5 +12,5 @@ public class UserRequestDto {
     String email;
     String address;
     String gender;
-    String age;
+    Integer age;
 }

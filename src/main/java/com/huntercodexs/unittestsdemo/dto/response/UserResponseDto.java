@@ -12,7 +12,7 @@ public class UserResponseDto {
     String email;
     String address;
     String gender;
-    String age;
+    Integer age;
     String active;
     String createdAt;
     String updatedAt;

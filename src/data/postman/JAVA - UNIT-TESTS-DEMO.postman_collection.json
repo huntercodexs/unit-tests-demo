@@ -1,0 +1,399 @@
+{
+	"info": {
+		"_postman_id": "9877f123-cba9-49f1-8c17-5eeecb5e6d43",
+		"name": "JAVA - UNIT-TESTS-DEMO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Read User by id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/users/123456",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"users",
+								"123456"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Users",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Username Tester\",\n    \"email\": \"username@tester.com\",\n    \"address\": \"Address Username Tester 1234\",\n    \"gender\": \"Gender\",\n    \"age\": 46\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User by id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/users/123456",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"users",
+								"123456"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User by id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Username Tester\",\n    \"email\": \"username@tester.com\",\n    \"address\": \"Address Username Tester 1234\",\n    \"gender\": \"Gender\",\n    \"age\": 34\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/users/123456",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"users",
+								"123456"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patch User by id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"username2@tester.com\",\n    \"address\": \"Address Username Tester 1234567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/users/123456",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"users",
+								"123456"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Extenal User",
+			"item": [
+				{
+					"name": "Read User by id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/external/users/123456",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"external",
+								"users",
+								"123456"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Users",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/external/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"external",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Username Tester\",\n    \"email\": \"username@tester.com\",\n    \"address\": \"Address Username Tester 1234\",\n    \"gender\": \"Gender\",\n    \"age\": 46\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/external/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"external",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User by id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/external/users/123456",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"external",
+								"users",
+								"123456"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User by id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Username Tester\",\n    \"email\": \"username@tester.com\",\n    \"address\": \"Address Username Tester 1234\",\n    \"gender\": \"Gender\",\n    \"age\": 34\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/external/users/123456",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"external",
+								"users",
+								"123456"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patch User by id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"username2@tester.com\",\n    \"address\": \"Address Username Tester 1234567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:31790/huntercodexs/unit-tests/api/v1/external/users/123456",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "31790",
+							"path": [
+								"huntercodexs",
+								"unit-tests",
+								"api",
+								"v1",
+								"external",
+								"users",
+								"123456"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -1,7 +1,7 @@
 package com.huntercodexs.unittestsdemo.service;
 
 import com.huntercodexs.unittestsdemo.dto.request.UserRequestDto;
-import com.huntercodexs.unittestsdemo.dto.response.UserResponseDto;
+import com.huntercodexs.unittestsdemo.external.ExternalUserResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -15,28 +15,28 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class ClientService {
 
-    @Value("${application.base-url-remote}")
+    @Value("${external.base-url-remote}")
     String baseUrlRemote;
 
-    @Value("${application.base-uri-remote-get-user-id}")
+    @Value("${external.base-uri-remote-get-user-id}")
     String uriGetUserId;
 
-    @Value("${application.base-uri-remote-get-users}")
+    @Value("${external.base-uri-remote-get-users}")
     String uriGetUsers;
 
-    @Value("${application.base-uri-remote-create-user}")
+    @Value("${external.base-uri-remote-create-user}")
     String uriCreateUser;
 
-    @Value("${application.base-uri-remote-delete-user}")
+    @Value("${external.base-uri-remote-delete-user}")
     String uriDeleteUser;
 
-    @Value("${application.base-uri-remote-update-user}")
+    @Value("${external.base-uri-remote-update-user}")
     String uriUpdateUser;
 
-    @Value("${application.base-uri-remote-patch-user}")
+    @Value("${external.base-uri-remote-patch-user}")
     String uriPatchUser;
 
-    @Value("${remote.basic-auth}")
+    @Value("${external.basic-auth}")
     String remoteBasicAuth;
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -53,7 +53,7 @@ public class ClientService {
         return new HttpComponentsClientHttpRequestFactory(httpClient);
     }
 
-    public ResponseEntity<UserResponseDto> findUserId(String id) {
+    public ResponseEntity<ExternalUserResponseDto> findUserById(String id) {
 
         log.info("findUserId by ClientService is calling");
 
@@ -61,14 +61,14 @@ public class ClientService {
         HttpEntity<UserRequestDto> httpEntity = new HttpEntity<>(httpRequestHeaders());
 
         try {
-            return restTemplate.exchange(urlFindUserId, HttpMethod.GET, httpEntity, UserResponseDto.class);
+           return restTemplate.exchange(urlFindUserId, HttpMethod.GET, httpEntity, ExternalUserResponseDto.class);
         } catch (RuntimeException re) {
-            throw new RuntimeException("Error on findUserId");
+            throw new RuntimeException("Error on findUserId: " + re.getMessage());
         }
 
     }
 
-    public ResponseEntity<UserResponseDto> findUsers() {
+    public ResponseEntity<ExternalUserResponseDto> findUsers() {
 
         log.info("findUsers by ClientService is calling");
 
@@ -76,14 +76,14 @@ public class ClientService {
         HttpEntity<UserRequestDto> httpEntity = new HttpEntity<>(httpRequestHeaders());
 
         try {
-            return restTemplate.exchange(urlFindUsers, HttpMethod.GET, httpEntity, UserResponseDto.class);
+            return restTemplate.exchange(urlFindUsers, HttpMethod.GET, httpEntity, ExternalUserResponseDto.class);
         } catch (RuntimeException re) {
-            throw new RuntimeException("Error on findUsers");
+            throw new RuntimeException("Error on findUsers: " + re.getMessage());
         }
 
     }
 
-    public ResponseEntity<UserResponseDto> createUser(UserRequestDto userRequestDto) {
+    public ResponseEntity<ExternalUserResponseDto> createUser(UserRequestDto userRequestDto) {
 
         log.info("createUser by ClientService is calling");
 
@@ -91,14 +91,14 @@ public class ClientService {
         HttpEntity<UserRequestDto> httpEntity = new HttpEntity<>(userRequestDto, httpRequestHeaders());
 
         try {
-            return restTemplate.postForEntity(urlCreateUser, httpEntity, UserResponseDto.class);
+            return restTemplate.postForEntity(urlCreateUser, httpEntity, ExternalUserResponseDto.class);
         } catch (RuntimeException re) {
-            throw new RuntimeException("Error on createUser");
+            throw new RuntimeException("Error on createUser: " + re.getMessage());
         }
 
     }
 
-    public ResponseEntity<UserResponseDto> deleteUser(String id) {
+    public ResponseEntity<ExternalUserResponseDto> deleteUserById(String id) {
 
         log.info("deleteUser by ClientService is calling");
 
@@ -106,14 +106,14 @@ public class ClientService {
         HttpEntity<UserRequestDto> httpEntity = new HttpEntity<>(httpRequestHeaders());
 
         try {
-            return restTemplate.exchange(urlDeleteUser, HttpMethod.DELETE, httpEntity, UserResponseDto.class);
+            return restTemplate.exchange(urlDeleteUser, HttpMethod.DELETE, httpEntity, ExternalUserResponseDto.class);
         } catch (RuntimeException re) {
-            throw new RuntimeException("Error on deleteUser");
+            throw new RuntimeException("Error on deleteUser: " + re.getMessage());
         }
 
     }
 
-    public ResponseEntity<UserResponseDto> updateUser(String id, UserRequestDto userRequestDto) {
+    public ResponseEntity<ExternalUserResponseDto> updateUserById(String id, UserRequestDto userRequestDto) {
 
         log.info("updateUser by ClientService is calling");
 
@@ -121,13 +121,13 @@ public class ClientService {
         HttpEntity<UserRequestDto> httpEntity = new HttpEntity<>(userRequestDto, httpRequestHeaders());
 
         try {
-            return restTemplate.exchange(urlUpdateUser, HttpMethod.PUT, httpEntity, UserResponseDto.class);
+            return restTemplate.exchange(urlUpdateUser, HttpMethod.PUT, httpEntity, ExternalUserResponseDto.class);
         } catch (RuntimeException re) {
-            throw new RuntimeException("Error on update user");
+            throw new RuntimeException("Error on update user: " + re.getMessage());
         }
     }
 
-    public ResponseEntity<UserResponseDto> patchUser(String id, UserRequestDto userRequestDto) {
+    public ResponseEntity<ExternalUserResponseDto> patchUserById(String id, UserRequestDto userRequestDto) {
 
         log.info("patchUser by ClientService is calling");
 
@@ -136,9 +136,9 @@ public class ClientService {
 
         try {
             restTemplate.setRequestFactory(httpClientFactory());
-            return restTemplate.exchange(urlPatchUser, HttpMethod.PATCH, httpEntity, UserResponseDto.class);
+            return restTemplate.exchange(urlPatchUser, HttpMethod.PATCH, httpEntity, ExternalUserResponseDto.class);
         } catch (RuntimeException re) {
-            throw new RuntimeException("Error on patch user");
+            throw new RuntimeException("Error on patch user: " + re.getMessage());
         }
     }
 
