@@ -2,6 +2,7 @@ package com.huntercodexs.unittestsdemo.service;
 
 import com.huntercodexs.unittestsdemo.dto.request.UserRequestDto;
 import com.huntercodexs.unittestsdemo.dto.response.UserResponseDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +50,9 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<UserResponseDto> one(String id) {
+    public ResponseEntity<UserResponseDto> one(Integer id) {
+        if (id == 0) return ResponseEntity.notFound().build();
+        if (!id.toString().replaceAll("\\d", "").equals("")) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok().body(mapperResponseUserIdDto());
     }
 
@@ -62,10 +65,16 @@ public class UserService {
     }
 
     public ResponseEntity<UserResponseDto> delete(String id) {
+        if (id.equals("0")) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().body(mapperResponseDeleteUserDto());
     }
 
     public ResponseEntity<UserResponseDto> update(String id, UserRequestDto userRequestDto) {
+        if (id.equals("0")) {
+            return ResponseEntity.notFound().build();
+        }
         if (!isUpdate(userRequestDto)) {
             throw new RuntimeException("Request is not an update !");
         }
@@ -73,6 +82,9 @@ public class UserService {
     }
 
     public ResponseEntity<UserResponseDto> patch(String id, UserRequestDto userRequestDto) {
+        if (id.equals("0")) {
+            return ResponseEntity.notFound().build();
+        }
         if (!isPatch(userRequestDto)) {
             throw new RuntimeException("Request is not an patch !");
         }

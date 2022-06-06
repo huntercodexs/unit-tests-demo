@@ -20,6 +20,9 @@ public class ExternalApplicationSimulatorService {
         if (!externalApplicationSimulatorSecurity.authorization(headers)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UNAUTHORIZED");
         }
+        if (id.equals("0")) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().body(mapperExternalResponseUserIdDto());
     }
 
@@ -41,6 +44,9 @@ public class ExternalApplicationSimulatorService {
         if (!externalApplicationSimulatorSecurity.authorization(headers)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UNAUTHORIZED");
         }
+        if (id.equals("0")) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().body(mapperExternalResponseDeleteUserDto());
     }
 
@@ -48,12 +54,18 @@ public class ExternalApplicationSimulatorService {
         if (!externalApplicationSimulatorSecurity.authorization(headers)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UNAUTHORIZED");
         }
+        if (id.equals("0")) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().body(mapperExternalResponseUpdateUserDto(userRequestDto));
     }
 
     public ResponseEntity<?> patch(HttpServletRequest headers, String id, UserRequestDto userRequestDto) {
         if (!externalApplicationSimulatorSecurity.authorization(headers)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UNAUTHORIZED");
+        }
+        if (id.equals("0")) {
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok().body(mapperExternalResponsePatchUserDto(userRequestDto));
     }

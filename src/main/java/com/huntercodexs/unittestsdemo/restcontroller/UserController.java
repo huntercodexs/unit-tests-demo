@@ -24,7 +24,7 @@ public class UserController {
      */
     @GetMapping(path = "/users/{id}")
     @ResponseBody
-    public ResponseEntity<UserResponseDto> one(@PathVariable("id") String id) {
+    public ResponseEntity<UserResponseDto> one(@PathVariable("id") Integer id) {
         log.info("GET Index Users id is calling");
         return userService.one(id);
     }

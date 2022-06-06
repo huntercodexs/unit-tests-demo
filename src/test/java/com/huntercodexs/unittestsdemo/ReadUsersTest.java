@@ -18,18 +18,18 @@ public class ReadUsersTest extends AbstractTest {
      */
 
     @Test
-    public void whenCorrectRequestToGetAllUsers_RetrieveUsersFound_200() throws Exception {
-        okByHttpGet(props.getProperty("test.find-users-uri"), "");
+    public void whenCorrectRequestToGetAllUsersLocal_RetrieveUsersFound_200() throws Exception {
+        okByHttpGet(props.getProperty("test.local.read-users-uri"), "");
     }
 
     @Test
-    public void whenRequestToGetAllUsersButUsersNotFound_RetrieveUsersNotFound_409() throws Exception {
-        System.out.println("whenRequestToGetAllUsersButUsersNotFound_RetrieveUsersNotFound_409 is Ignored !");
-    }
-
-    @Test
-    public void whenRequestToGetAllUsersButServerError_RetrieveServerError_500() throws Exception {
-        System.out.println("whenRequestToGetAllUsersButServerError_RetrieveServerError_500 is Ignored !");
+    public void whenRequestToGetExternalUserWithInvalidCredentials_RetrieveUnauthorized_401() throws Exception {
+        /*NOTE: Change the application.properties in external.basic-auth field*/
+        try {
+            unauthorizedByHttpGet(props.getProperty("test.external.read-user-uri"), "");
+        } catch (Exception e) {
+            tryAssertResponse("Error on findUsers: 401 null", e.getMessage());
+        }
     }
 
 }

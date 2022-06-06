@@ -1,5 +1,6 @@
 package com.huntercodexs.unittestsdemo;
 
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,9 +14,9 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Properties;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,9 +28,11 @@ public abstract class AbstractTest {
 
     private static final String propFile = "classpath:test.properties";
     protected final Properties props = loadPropsTest();
-    protected final String authRequest = props.getProperty("test.basic-authorization-local");
-    protected final String invalidAuthRequest = props.getProperty("test.basic-authorization-local-invalid");
-    protected String uriBaseTest = props.getProperty("test.uri-base-test");
+    protected final String authRequestLocal = props.getProperty("test.basic-authorization-local");
+    protected final String invalidAuthRequestLocal = props.getProperty("test.basic-authorization-local-invalid");
+    protected final String authRequestExternal = props.getProperty("test.basic-authorization-external");
+    protected final String invalidAuthRequestExternal = props.getProperty("test.basic-authorization-external-invalid");
+    protected String uriBaseTest = props.getProperty("test.base-uri-local");
     protected MockMvc mockMvc;
 
     @Autowired
@@ -44,7 +47,7 @@ public abstract class AbstractTest {
 
         try {
             File file = ResourceUtils.getFile(AbstractTest.propFile);
-            InputStream in = new FileInputStream(file);
+            InputStream in = Files.newInputStream(file.toPath());
             properties.load(in);
         } catch (IOException ioe) {
             System.out.println(ioe.getMessage());
@@ -60,7 +63,7 @@ public abstract class AbstractTest {
                                 .content(user_data)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 ).andReturn();
     }
 
@@ -68,8 +71,16 @@ public abstract class AbstractTest {
         mockMvc.perform(
                         MockMvcRequestBuilders
                                 .delete(uriBaseTest+"/"+md5Id)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 ).andReturn();
+    }
+
+    protected void tryAssertResponse(String ref, String text) {
+        if (text.contains(ref)) {
+            Assert.assertEquals(1, 1);
+        } else {
+            Assert.assertEquals(1, 0);
+        }
     }
 
     /**
@@ -85,7 +96,7 @@ public abstract class AbstractTest {
                         .get(uriBaseTest)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("Authorization", invalidAuthRequest)
+                        .header("Authorization", invalidAuthRequestLocal)
                 )
                 .andExpect(status().isUnauthorized())
                 .andReturn();
@@ -101,7 +112,7 @@ public abstract class AbstractTest {
                                 .get(uriBaseTest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isMethodNotAllowed())
                 .andReturn();
@@ -117,7 +128,7 @@ public abstract class AbstractTest {
                                 .get(uriBaseTest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -133,7 +144,7 @@ public abstract class AbstractTest {
                                 .get(uriBaseTest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isOk())
                 .andReturn();
@@ -149,7 +160,7 @@ public abstract class AbstractTest {
                                 .get(uriBaseTest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -165,7 +176,7 @@ public abstract class AbstractTest {
                                 .get(uriBaseTest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isAccepted())
                 .andReturn();
@@ -181,7 +192,7 @@ public abstract class AbstractTest {
                                 .get(uriBaseTest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isNotFound())
                 .andReturn();
@@ -197,7 +208,7 @@ public abstract class AbstractTest {
                                 .get(uriBaseTest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isConflict())
                 .andReturn();
@@ -213,7 +224,7 @@ public abstract class AbstractTest {
                                 .get(uriBaseTest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isInternalServerError())
                 .andReturn();
@@ -233,7 +244,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", invalidAuthRequest)
+                                .header("Authorization", invalidAuthRequestLocal)
                 )
                 .andExpect(status().isUnauthorized())
                 .andReturn();
@@ -250,7 +261,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isMethodNotAllowed())
                 .andReturn();
@@ -267,7 +278,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -284,7 +295,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isOk())
                 .andReturn();
@@ -301,7 +312,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -318,7 +329,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isAccepted())
                 .andReturn();
@@ -335,7 +346,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isNotFound())
                 .andReturn();
@@ -352,7 +363,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isFound())
                 .andReturn();
@@ -369,7 +380,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isConflict())
                 .andReturn();
@@ -386,7 +397,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isInternalServerError())
                 .andReturn();
@@ -406,7 +417,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", invalidAuthRequest)
+                                .header("Authorization", invalidAuthRequestLocal)
                 )
                 .andExpect(status().isUnauthorized())
                 .andReturn();
@@ -423,7 +434,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isMethodNotAllowed())
                 .andReturn();
@@ -440,7 +451,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -457,7 +468,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isOk())
                 .andReturn();
@@ -474,7 +485,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -491,7 +502,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isAccepted())
                 .andReturn();
@@ -508,7 +519,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isNotFound())
                 .andReturn();
@@ -525,7 +536,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isConflict())
                 .andReturn();
@@ -542,7 +553,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isInternalServerError())
                 .andReturn();
@@ -559,7 +570,7 @@ public abstract class AbstractTest {
         mockMvc.perform(
                 MockMvcRequestBuilders
                         .delete(uriBaseTest)
-                        .header("Authorization", invalidAuthRequest)
+                        .header("Authorization", invalidAuthRequestLocal)
                 )
                 .andExpect(status().isUnauthorized())
                 .andReturn();
@@ -573,7 +584,7 @@ public abstract class AbstractTest {
         mockMvc.perform(
                         MockMvcRequestBuilders
                                 .delete(uriBaseTest)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isMethodNotAllowed())
                 .andReturn();
@@ -587,7 +598,7 @@ public abstract class AbstractTest {
         mockMvc.perform(
                         MockMvcRequestBuilders
                                 .delete(uriBaseTest)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -601,7 +612,7 @@ public abstract class AbstractTest {
         mockMvc.perform(
                         MockMvcRequestBuilders
                                 .delete(uriBaseTest)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isConflict())
                 .andReturn();
@@ -615,7 +626,7 @@ public abstract class AbstractTest {
         mockMvc.perform(
                         MockMvcRequestBuilders
                                 .delete(uriBaseTest)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isOk())
                 .andReturn();
@@ -629,7 +640,7 @@ public abstract class AbstractTest {
         mockMvc.perform(
                         MockMvcRequestBuilders
                                 .delete(uriBaseTest)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isAccepted())
                 .andReturn();
@@ -643,7 +654,7 @@ public abstract class AbstractTest {
         mockMvc.perform(
                         MockMvcRequestBuilders
                                 .delete(uriBaseTest)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isNotFound())
                 .andReturn();
@@ -657,7 +668,7 @@ public abstract class AbstractTest {
         mockMvc.perform(
                         MockMvcRequestBuilders
                                 .delete(uriBaseTest)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isInternalServerError())
                 .andReturn();
@@ -677,7 +688,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", invalidAuthRequest)
+                                .header("Authorization", invalidAuthRequestLocal)
                 )
                 .andExpect(status().isUnauthorized())
                 .andReturn();
@@ -694,7 +705,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isMethodNotAllowed())
                 .andReturn();
@@ -711,7 +722,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -728,7 +739,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isOk())
                 .andReturn();
@@ -745,7 +756,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isAccepted())
                 .andReturn();
@@ -762,7 +773,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isNotFound())
                 .andReturn();
@@ -779,7 +790,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isConflict())
                 .andReturn();
@@ -796,7 +807,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isInternalServerError())
                 .andReturn();
@@ -816,7 +827,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", invalidAuthRequest)
+                                .header("Authorization", invalidAuthRequestLocal)
                 )
                 .andExpect(status().isUnauthorized())
                 .andReturn();
@@ -833,7 +844,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isMethodNotAllowed())
                 .andReturn();
@@ -850,7 +861,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -867,7 +878,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isOk())
                 .andReturn();
@@ -884,7 +895,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isNotFound())
                 .andReturn();
@@ -901,7 +912,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isConflict())
                 .andReturn();
@@ -918,7 +929,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isInternalServerError())
                 .andReturn();
@@ -938,7 +949,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", invalidAuthRequest)
+                                .header("Authorization", invalidAuthRequestLocal)
                 )
                 .andExpect(status().isUnauthorized())
                 .andReturn();
@@ -955,7 +966,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isMethodNotAllowed())
                 .andReturn();
@@ -972,7 +983,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -989,7 +1000,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isOk())
                 .andReturn();
@@ -1006,7 +1017,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isNotFound())
                 .andReturn();
@@ -1023,7 +1034,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isConflict())
                 .andReturn();
@@ -1040,7 +1051,7 @@ public abstract class AbstractTest {
                                 .content(dataRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", authRequest)
+                                .header("Authorization", authRequestLocal)
                 )
                 .andExpect(status().isInternalServerError())
                 .andReturn();
