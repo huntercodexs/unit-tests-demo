@@ -4,14 +4,16 @@ import com.huntercodexs.unittestsdemo.UnitTestsDemoApplication;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,13 +22,29 @@ import java.util.regex.Pattern;
 @WebAppConfiguration
 public abstract class UnitAbstractTest {
 
-    protected MockMvc mockMvc;
+    private static final String propFile = "classpath:unit.test.properties";
+    protected final Properties props = loadPropsTest();
 
-    @Autowired
-    WebApplicationContext webApplicationContext;
+    public static Properties loadPropsTest() {
+        Properties properties = new Properties();
 
-    protected void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        try {
+            File file = ResourceUtils.getFile(UnitAbstractTest.propFile);
+            InputStream in = Files.newInputStream(file.toPath());
+            properties.load(in);
+        } catch (IOException ioe) {
+            System.out.println(ioe.getMessage());
+        }
+
+        return properties;
+    }
+
+    protected void assertionExact(String ref, String text) {
+        if (text.equals(ref)) {
+            Assert.assertEquals(1, 1);
+        } else {
+            Assert.assertEquals(1, 0);
+        }
     }
 
     protected void assertionText(String ref, String text) {
@@ -49,17 +67,17 @@ public abstract class UnitAbstractTest {
         }
     }
 
-    protected static boolean isCpf(String cpf) {
+    protected void isCpf(String cpf) {
 
-        if (cpf.length() > 11) return false;
+        if (cpf.length() > 11) Assert.fail();
 
         cpf = cpf.replace(".", "");
         cpf = cpf.replace("-", "");
 
         try {
             Long.parseLong(cpf);
-        } catch(NumberFormatException e){
-            return false;
+        } catch(NumberFormatException e) {
+            Assert.fail();
         }
 
         int d1, d2;
@@ -96,10 +114,10 @@ public abstract class UnitAbstractTest {
 
         nDigResult = String.valueOf(digit1) + String.valueOf(digit2);
 
-        return digitVerify.equals(nDigResult);
+        Assert.assertEquals(digitVerify, nDigResult);
     }
 
-    protected static boolean isMail(String email) {
+    protected void isMail(String email) {
         boolean isValidMail = false;
         if (email != null && email.length() > 0) {
             String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
@@ -109,20 +127,24 @@ public abstract class UnitAbstractTest {
                 isValidMail = true;
             }
         }
-        return !isValidMail;
+        Assert.assertTrue(isValidMail);
     }
 
-    protected static boolean isPhone(String phoneNumber) {
+    protected void isPhone(String phoneNumber) {
         boolean isValidPhone = false;
         if (phoneNumber != null && phoneNumber.length() > 0) {
-            String expression = "^[0-9]{13}$";
+            String expression = "^[+]?[0-9]{13}$";
             Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(phoneNumber);
             if (matcher.matches()) {
                 isValidPhone = true;
             }
         }
-        return isValidPhone;
+        Assert.assertTrue(isValidPhone);
+    }
+
+    protected void assertionSum(int a, int b, int c) {
+        if (a + b == c) Assert.assertTrue(true);
     }
 
 }

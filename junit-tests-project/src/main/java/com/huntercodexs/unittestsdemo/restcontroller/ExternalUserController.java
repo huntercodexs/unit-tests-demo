@@ -78,7 +78,7 @@ public class ExternalUserController {
     @PatchMapping(path = "/external/users/{id}")
     @ResponseBody
     public ResponseEntity<?> patch(
-            @Valid @RequestBody(required = false) UserRequestDto userRequestDto,
+            @RequestBody(required = false) UserRequestDto userRequestDto,
             @PathVariable("id") String id
     ) {
         log.info("PATCH Index id External Users is calling");

@@ -776,8 +776,6 @@ public abstract class IntegrationAbstractTest {
         if (!uri.equals("")) integrationUriBaseTest = uri;
         if (!id.equals("")) integrationUriBaseTest = integrationUriBaseTest+"/"+id;
 
-        System.out.println(">> >> >> " + integrationUriBaseTest);
-
         mockMvc.perform(
                         MockMvcRequestBuilders
                                 .patch(integrationUriBaseTest)

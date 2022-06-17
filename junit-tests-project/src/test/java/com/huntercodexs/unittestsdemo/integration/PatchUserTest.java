@@ -54,6 +54,18 @@ public class PatchUserTest extends IntegrationAbstractTest {
     }
 
     @Test
+    public void whenRequestToPatchUserWithInvalidBody_RetrieveConflict_409() throws Exception {
+        try {
+            conflictByHttpPatch(
+                    props.getProperty("integration.test.patch-user-uri"),
+                    props.getProperty("integration.test.patch-user-by-id"),
+                    props.getProperty("integration.test.patch-user-body-invalid"));
+        } catch (Exception e) {
+            assertIntegration("409 Conflict", e.getMessage());
+        }
+    }
+
+    @Test
     public void whenRequestToPatchUserMailAddress_RetrieveUserPatched_202() throws Exception {
         try {
             acceptedByHttpPatch(
