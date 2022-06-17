@@ -18,41 +18,46 @@ public class CreateUserTest extends ExternalAbstractTest {
 
     @Test
     public void whenRequestToCreateUserUnauthorized_RetrieveUnauthorized_401() throws Exception {
-        unauthorizedByHttpPost(
+        assertRestByPost(
                 props.getProperty("external.test.post-user-uri"),
                 "",
-                props.getProperty("external.test.post-user-body-correct"));
+                props.getProperty("external.test.post-user-body-correct"),
+                401);
     }
 
     @Test
     public void whenRequestToCreateUserButNoBody_RetrieveMissingBodyRequest_400() throws Exception {
-        badRequestByHttpPost(
+        assertRestByPost(
                 props.getProperty("external.test.post-user-uri"),
                 "",
-                props.getProperty("external.test.post-user-no-body"));
+                props.getProperty("external.test.post-user-no-body"),
+                400);
     }
 
     @Test
     public void whenRequestToCreateUserButNoBodyData_RetrieveMissingBodyRequest_400() throws Exception {
-        badRequestByHttpPost(
+        assertRestByPost(
                 props.getProperty("external.test.post-user-uri"),
                 "",
-                props.getProperty("external.test.post-user-no-body-data"));
+                props.getProperty("external.test.post-user-no-body-data"),
+                400);
     }
 
     @Test
     public void whenRequestToCreateUserAlreadyExists_RetrieveConflict_409() throws Exception {
-        conflictByHttpPost(
+        assertRestByPost(
                 props.getProperty("external.test.post-user-uri"),
                 "",
-                props.getProperty("external.test.post-user-body-conflict"));
+                props.getProperty("external.test.post-user-body-conflict"),
+                409);
     }
 
     @Test
     public void whenRequestToCreateUserCorrectly_RetrieveOK_200() throws Exception {
-        okByHttpPost(
+        assertRestByPost(
                 props.getProperty("external.test.post-user-uri"),
                 "",
-                props.getProperty("external.test.post-user-body-correct"));
+                props.getProperty("external.test.post-user-body-correct"),
+                200);
     }
 }

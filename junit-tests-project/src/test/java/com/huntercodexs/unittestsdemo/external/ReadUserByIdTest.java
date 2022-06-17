@@ -20,23 +20,29 @@ public class ReadUserByIdTest extends ExternalAbstractTest {
 
     @Test
     public void whenRequestToGetExternalUserByIdUnauthorized_RetrieveUnauthorized_401() throws Exception {
-        unauthorizedByHttpGet(
+        assertRestByGet(
                 props.getProperty("external.test.get-user-uri"),
-                props.getProperty("external.test.get-user-by-id"));
+                props.getProperty("external.test.get-user-by-id"),
+                null,
+                401);
     }
 
     @Test
     public void whenRequestToGetExternalUserByIdThatNotExists_RetrieveUserNotFound_404() throws Exception {
-        notFoundByHttpGet(
+        assertRestByGet(
                 props.getProperty("external.test.get-user-uri"),
-                props.getProperty("external.test.get-user-by-id-not-found"));
+                props.getProperty("external.test.get-user-by-id-not-found"),
+                null,
+                404);
     }
 
     @Test
     public void whenRequestToGetExternalUserByIdNonInteger_RetrieveBadRequest_400() throws Exception {
-        badRequestByHttpGet(
+        assertRestByGet(
                 props.getProperty("external.test.get-user-uri"),
-                props.getProperty("external.test.get-user-by-id-non-integer"));
+                props.getProperty("external.test.get-user-by-id-non-integer"),
+                null,
+                400);
     }
 
     @Test
@@ -46,9 +52,11 @@ public class ReadUserByIdTest extends ExternalAbstractTest {
 
     @Test
     public void whenCorrectRequestToGetExternalUserById_RetrieveUserFound_200() throws Exception {
-        okByHttpGet(
+        assertRestByGet(
                 props.getProperty("external.test.get-user-uri"),
-                props.getProperty("external.test.get-user-by-id"));
+                props.getProperty("external.test.get-user-by-id"),
+                null,
+                200);
     }
 
 }

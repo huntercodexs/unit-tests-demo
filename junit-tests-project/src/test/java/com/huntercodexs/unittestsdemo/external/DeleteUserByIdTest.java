@@ -20,30 +20,38 @@ public class DeleteUserByIdTest extends ExternalAbstractTest {
 
     @Test
     public void whenRequestToDeleteUserByIdUnauthorized_RetrieveUnauthorized_401() throws Exception {
-        unauthorizedByHttpDelete(
+        assertRestByDelete(
                 props.getProperty("external.test.delete-user-uri"),
-                props.getProperty("external.test.delete-user-by-id-not-found"));
+                props.getProperty("external.test.delete-user-by-id-not-found"),
+                null,
+                401);
     }
 
     @Test
     public void whenRequestToDeleteUserByIdButUserNotFound_RetrieveUserNotFound_404() throws Exception {
-        notFoundByHttpDelete(
+        assertRestByDelete(
                 props.getProperty("external.test.delete-user-uri"),
-                props.getProperty("external.test.delete-user-by-id-not-found"));
+                props.getProperty("external.test.delete-user-by-id-not-found"),
+                null,
+                404);
     }
 
     @Test
     public void whenRequestToDeleteUserByIdNonInteger_RetrieveBadRequest_400() throws Exception {
-        badRequestByHttpGet(
+        assertRestByDelete(
                 props.getProperty("external.test.delete-user-uri"),
-                props.getProperty("external.test.delete-user-by-id-non-integer"));
+                props.getProperty("external.test.delete-user-by-id-non-integer"),
+                null,
+                400);
     }
 
     @Test
     public void whenCorrectRequestToDeleteUserById_RetrieveUsersDeleted_200() throws Exception {
-        okByHttpDelete(
+        assertRestByDelete(
                 props.getProperty("external.test.delete-user-uri"),
-                props.getProperty("external.test.delete-user-by-id"));
+                props.getProperty("external.test.delete-user-by-id"),
+                null,
+                200);
     }
 
     @Test

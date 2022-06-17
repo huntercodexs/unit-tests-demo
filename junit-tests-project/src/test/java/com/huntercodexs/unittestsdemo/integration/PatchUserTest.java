@@ -15,76 +15,53 @@ public class PatchUserTest extends IntegrationAbstractTest {
     }
 
     /**
-     * Fix User by id
+     * Patch User by id
      */
-
-    @Test
-    public void whenRequestToUpdateUserMailAddressMailButNoUserName_RetrieveMissingUserName_409() throws Exception {
-        conflictByHttpPatch(
-                props.getProperty("integration.test.patch-user-uri"),
-                " ", /*id = username*/
-                props.getProperty("integration.test.patch-user-mail"));
-    }
-
-    @Test
-    public void whenRequestToUpdateUserMailAddressButEmailIsInvalid_RetrieveInvalidEmail_409() throws Exception {
-        conflictByHttpPatch(
-                props.getProperty("integration.test.patch-user-uri"),
-                props.getProperty("integration.test.patch-user-id"),
-                props.getProperty("integration.test.patch-user-mail-invalid"));
-    }
-
-    @Test
-    public void whenRequestToUpdateUserMailAddressButEmailAlreadyExists_RetrieveEmailAlreadyExists_409() throws Exception {
-        conflictByHttpPatch(
-                props.getProperty("integration.test.patch-user-uri"),
-                props.getProperty("integration.test.patch-user-id"),
-                props.getProperty("integration.test.patch-user-mail-conflict"));
-    }
-
-    @Test
-    public void whenRequestToUpdateUserMailAddress_RetrieveUserUpdated_200() throws Exception {
-        boolean skip = true;
-        if (!skip) {
-            okByHttpPatch(
+    public void whenRequestToPatchUserByIdUnauthorized_RetrieveUnauthorized_401() throws Exception {
+        /*NOTE: Change the application.properties in external.basic-auth field or use external.basic-auth-invalid*/
+        try {
+            unauthorizedByHttpPatch(
                     props.getProperty("integration.test.patch-user-uri"),
                     props.getProperty("integration.test.patch-user-id"),
-                    props.getProperty("integration.test.patch-user-mail"));
+                    props.getProperty("integration.test.patch-user-body-correct"));
+        } catch (Exception e) {
+            assertIntegration("401 Null", e.getMessage());
         }
     }
 
     @Test
-    public void whenRequestToUpdateUserMailAddressUsingWebHook_RetrieveUserUpdated_202() throws Exception {
-        boolean skip = true;
-        if (!skip) {
+    public void whenRequestToPatchUserMailAddressMailButNoUserName_RetrieveMissingUserName_404() throws Exception {
+        try {
+            notFoundByHttpPatch(
+                    props.getProperty("integration.test.patch-user-uri"),
+                    props.getProperty("integration.test.patch-user-by-id-not-found"),
+                    props.getProperty("integration.test.patch-user-body-correct"));
+        } catch (Exception e) {
+            assertIntegration("404 Not Found", e.getMessage());
+        }
+    }
+
+    @Test
+    public void whenRequestToPatchUserByIdNonInteger_RetrieveBadRequest_400() throws Exception {
+        try {
+            badRequestByHttpPatch(
+                    props.getProperty("integration.test.patch-user-uri"),
+                    props.getProperty("integration.test.patch-user-by-id-non-integer"),
+                    props.getProperty("integration.test.patch-user-body-correct"));
+        } catch (Exception e) {
+            assertIntegration("400 Bad Request", e.getMessage());
+        }
+    }
+
+    @Test
+    public void whenRequestToPatchUserMailAddress_RetrieveUserPatched_202() throws Exception {
+        try {
             acceptedByHttpPatch(
                     props.getProperty("integration.test.patch-user-uri"),
-                    props.getProperty("integration.test.patch-user-id"),
-                    props.getProperty("integration.test.patch-user-mail-webhook"));
-        }
-    }
-
-    @Test
-    public void whenRequestToUpdateUserMailAddressExists_RetrieveUserUpdated_200() throws Exception {
-        boolean skip = true;
-        if (!skip) {
-            Thread.sleep(1500);
-            okByHttpPatch(
-                    props.getProperty("integration.test.patch-user-uri"),
-                    props.getProperty("integration.test.patch-user-id"),
-                    props.getProperty("integration.test.patch-user-mail-exists"));
-        }
-    }
-
-    @Test
-    public void whenRequestToUpdateUserMailAddressExistsUsingWebHook_RetrieveUserUpdated_202() throws Exception {
-        boolean skip = true;
-        if (!skip) {
-            Thread.sleep(1500);
-            acceptedByHttpPatch(
-                    props.getProperty("integration.test.patch-user-uri"),
-                    props.getProperty("integration.test.patch-user-id"),
-                    props.getProperty("integration.test.patch-user-mail-exists-webhook"));
+                    props.getProperty("integration.test.patch-user-by-id"),
+                    props.getProperty("integration.test.patch-user-body-correct"));
+        } catch (Exception e) {
+            assertIntegration("202 Accepted", e.getMessage());
         }
     }
 

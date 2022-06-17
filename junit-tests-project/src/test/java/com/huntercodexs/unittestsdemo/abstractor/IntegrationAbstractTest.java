@@ -84,7 +84,7 @@ public abstract class IntegrationAbstractTest {
                 ).andReturn();
     }
 
-    protected void assertionTest(String ref, String text) {
+    protected void assertIntegration(String ref, String text) {
         if (text.contains(ref)) {
             Assert.assertEquals(1, 1);
         } else {
@@ -775,6 +775,8 @@ public abstract class IntegrationAbstractTest {
 
         if (!uri.equals("")) integrationUriBaseTest = uri;
         if (!id.equals("")) integrationUriBaseTest = integrationUriBaseTest+"/"+id;
+
+        System.out.println(">> >> >> " + integrationUriBaseTest);
 
         mockMvc.perform(
                         MockMvcRequestBuilders

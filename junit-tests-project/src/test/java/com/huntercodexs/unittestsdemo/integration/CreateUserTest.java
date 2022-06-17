@@ -15,152 +15,78 @@ public class CreateUserTest extends IntegrationAbstractTest {
     }
 
     /**
-     * Test Create User
+     * Create User
      */
-
     @Test
-    public void whenRequestToCreateUserButNoBody_RetrieveMissingBodyRequest_409() throws Exception {
-        boolean skip = true;
-        if (!skip) {
-            conflictByHttpPost(
+    public void whenRequestToCreateUserUnauthorized_RetrieveUnauthorized_401() throws Exception {
+        /*NOTE: Change the application.properties in external.basic-auth field or use external.basic-auth-invalid*/
+        try {
+            unauthorizedByHttpPost(
                     props.getProperty("integration.test.post-user-uri"),
                     "",
-                    props.getProperty("integration.test.post-user-no-body"));
+                    props.getProperty("integration.test.post-user-body-correct"));
+        } catch (Exception e) {
+            assertIntegration("401 Null", e.getMessage());
         }
     }
 
     @Test
-    public void whenRequestToCreateUserButNoBodyData_RetrieveMissingBodyRequest_409() throws Exception {
-        conflictByHttpPost(
-                props.getProperty("integration.test.post-user-uri"),
-                "",
-                props.getProperty("integration.test.post-user-no-body-data"));
+    public void whenRequestToCreateUserButNoBody_RetrieveMissingBodyRequest_400() throws Exception {
+        try {
+            badRequestByHttpPost(
+                    props.getProperty("integration.test.post-user-uri"),
+                    "",
+                    props.getProperty("integration.test.post-user-no-body"));
+        } catch (Exception e) {
+            assertIntegration("400 Bad Request", e.getMessage());
+        }
     }
 
     @Test
-    public void whenRequestToCreateUserButNoUserName_RetrieveMissingUserName_409() throws Exception {
-        conflictByHttpPost(
-                props.getProperty("integration.test.post-user-uri"),
-                "",
-                props.getProperty("integration.test.post-user-no-username"));
-    }
-
-    @Test
-    public void whenRequestToCreateUserButNoName_RetrieveMissingName_409() throws Exception {
-        conflictByHttpPost(
-                props.getProperty("integration.test.post-user-uri"),
-                "",
-                props.getProperty("integration.test.post-user-no-name"));
-    }
-
-    @Test
-    public void whenRequestToCreateUserButNoPhoneNumberAndEmailAddress_RetrieveMissingDevice_409() throws Exception {
-        conflictByHttpPost(
-                props.getProperty("integration.test.post-user-uri"),
-                "",
-                props.getProperty("integration.test.post-user-no-device"));
-    }
-
-    @Test
-    public void whenRequestToCreateUserButPhoneIsInvalid_RetrieveInvalidPhoneNumber_409() throws Exception {
-        conflictByHttpPost(
-                props.getProperty("integration.test.post-user-uri"),
-                "",
-                props.getProperty("integration.test.post-user-invalid-phone"));
-    }
-
-    @Test
-    public void whenRequestToCreateUserButPhoneAlreadyExists_RetrievePhoneAlreadyExists_409() throws Exception {
-        conflictByHttpPost(
-                props.getProperty("integration.test.post-user-uri"),
-                "",
-                props.getProperty("integration.test.post-user-exists-phone"));
-    }
-
-    @Test
-    public void whenRequestToCreateUserButEmailIsInvalid_RetrieveInvalidEmailAddress_409() throws Exception {
-        conflictByHttpPost(
-                props.getProperty("integration.test.post-user-uri"),
-                "",
-                props.getProperty("integration.test.post-user-invalid-mail"));
-    }
-
-    @Test
-    public void whenRequestToCreateUserButEmailAlreadyExists_RetrieveEmailAddressAlreadyExists_409() throws Exception {
-        conflictByHttpPost(
-                props.getProperty("integration.test.post-user-uri"),
-                "",
-                props.getProperty("integration.test.post-user-exists-mail"));
-    }
-
-    @Test
-    public void whenRequestToCreateUserButUserNameIsNotEmailOrCpf_RetrieveWrongUserName_409() throws Exception {
-        conflictByHttpPost(
-                props.getProperty("integration.test.post-user-uri"),
-                "",
-                props.getProperty("integration.test.post-user-invalid-username"));
+    public void whenRequestToCreateUserButNoBodyData_RetrieveMissingBodyRequest_400() throws Exception {
+        try {
+            badRequestByHttpPost(
+                    props.getProperty("integration.test.post-user-uri"),
+                    "",
+                    props.getProperty("integration.test.post-user-no-body-data"));
+        } catch (Exception e) {
+            assertIntegration("400 Bad Request", e.getMessage());
+        }
     }
 
     @Test
     public void whenCorrectRequestToCreateUserButUserExists_RetrieveUserConflict_409() throws Exception {
-        conflictByHttpPost(
-                props.getProperty("integration.test.post-user-uri"),
-                "",
-                props.getProperty("integration.test.post-user-conflict"));
+        try {
+            conflictByHttpPost(
+                    props.getProperty("integration.test.post-user-uri"),
+                    "",
+                    props.getProperty("integration.test.post-user-body-conflict"));
+        } catch (Exception e) {
+            assertIntegration("409 Conflict", e.getMessage());
+        }
     }
 
     @Test
-    public void whenRequestToCreateUserButServerError_RetrieveServerError_500() throws Exception {
-        boolean skip = true;
-        if (!skip) {
-            serverErrorByHttpPost(
+    public void whenRequestToCreateUserButServerError_RetrieveBadRequest_400() throws Exception {
+        try {
+            badRequestByHttpPost(
                     props.getProperty("integration.test.post-user-uri"),
                     "",
-                    props.getProperty("integration.test.post-user-server-error"));
+                    props.getProperty("integration.test.post-user-body-error"));
+        } catch (Exception e) {
+            assertIntegration("400 Bad Request", e.getMessage());
         }
     }
 
     @Test
     public void whenCorrectRequestToCreateUser_RetrieveUserCreated_201() throws Exception {
-        boolean skip = true;
-        if (!skip) {
+        try {
             createdByHttpPost(
                     props.getProperty("integration.test.post-user-uri"),
                     "",
-                    props.getProperty("integration.test.post-user-correctly"));
-        }
-    }
-
-    @Test
-    public void whenCorrectRequestToCreateUserUsingWebHook_RetrieveUserCreated_202() throws Exception {
-        boolean skip = true;
-        if (!skip) {
-            acceptedByHttpPost(
-                    props.getProperty("integration.test.post-user-uri"),
-                    "",
-                    props.getProperty("integration.test.post-user-correctly-webhook"));
-        }
-    }
-
-    @Test
-    public void whenCorrectRequestToCreateUserUsingJustMail_RetrieveUserCreated_201() throws Exception {
-        boolean skip = true;
-        if (!skip) {
-            createdByHttpPost(
-                    props.getProperty("integration.test.post-user-uri"),
-                    "",
-                    props.getProperty("integration.test.post-user-just-using-mail"));
-        }
-    }
-
-    @Test
-    public void whenCorrectRequestToCreateUserUsingJustMailUsingWebHook_RetrieveUserCreated_202() throws Exception {
-        boolean skip = true;
-        if (!skip) {
-            createdByHttpPost(
-                    props.getProperty("integration.test.post-user-uri"),
-                    "",
-                    props.getProperty("integration.test.post-user-just-using-mail-webhook"));
+                    props.getProperty("integration.test.post-user-body-correct"));
+        } catch (Exception e) {
+            assertIntegration("201 Created", e.getMessage());
         }
     }
 }

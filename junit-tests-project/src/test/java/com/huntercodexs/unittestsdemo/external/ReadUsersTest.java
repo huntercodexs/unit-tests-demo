@@ -20,12 +20,20 @@ public class ReadUsersTest extends ExternalAbstractTest {
 
     @Test
     public void whenRequestToGetExternalUsersUnauthorized_RetrieveUnauthorized_401() throws Exception {
-        unauthorizedByHttpGet(props.getProperty("external.test.get-users-uri"), "");
+        assertRestByGet(
+                props.getProperty("external.test.get-users-uri"),
+                "",
+                null,
+                401);
     }
 
     @Test
     public void whenCorrectRequestToGetAllUsers_RetrieveUsersFound_200() throws Exception {
-        okByHttpGet(props.getProperty("external.test.get-users-uri"), "");
+        assertRestByGet(
+                props.getProperty("external.test.get-users-uri"),
+                "",
+                null,
+                200);
     }
 
 }

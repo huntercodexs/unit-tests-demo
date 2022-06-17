@@ -1,17 +1,23 @@
 package com.huntercodexs.unittestsdemo.abstractor;
 
 import com.huntercodexs.unittestsdemo.UnitTestsDemoApplication;
+import com.huntercodexs.unittestsdemo.external.ExternalUserResponseDto;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.File;
@@ -28,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public abstract class ExternalAbstractTest {
 
     protected MockMvc mockMvc;
+    protected RestTemplate restTemplate;
 
     private static final String propFile = "classpath:external.test.properties";
     protected final Properties props = loadPropsTest();
@@ -49,6 +56,7 @@ public abstract class ExternalAbstractTest {
 
     protected void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        restTemplate = new RestTemplate();
     }
 
     public static Properties loadPropsTest() {
@@ -92,978 +100,175 @@ public abstract class ExternalAbstractTest {
         }
     }
 
-    /**
-     * Using Http GET
-     */
-    protected void unauthorizedByHttpGet(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .get(externalUrlBaseTest+externalUriBaseTest)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("Authorization", externalInvalidBasicAuthorization)
-                )
-                .andExpect(status().isUnauthorized())
-                .andReturn();
+    protected HttpHeaders httpRequestHeaders(boolean invalidAuth) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        if (invalidAuth) {
+            httpHeaders.set("Authorization", externalInvalidBasicAuthorization);
+        } else {
+            httpHeaders.set("Authorization", externalBasicAuthorization);
+        }
+        return httpHeaders;
     }
 
-    protected void methodNotAllowedByHttpGet(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get(externalUrlBaseTest+externalUriBaseTest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isMethodNotAllowed())
-                .andReturn();
-    }
-
-    protected void badRequestByHttpGet(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get(externalUrlBaseTest+externalUriBaseTest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn();
-    }
-
-    protected void okByHttpGet(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get(externalUrlBaseTest+externalUriBaseTest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-
-    protected void createdByHttpGet(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get(externalUrlBaseTest+externalUriBaseTest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-    }
-
-    protected void acceptedByHttpGet(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get(externalUrlBaseTest+externalUriBaseTest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isAccepted())
-                .andReturn();
-    }
-
-    protected void notFoundByHttpGet(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get(externalUrlBaseTest+externalUriBaseTest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isNotFound())
-                .andReturn();
-    }
-
-    protected void conflictByHttpGet(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get(externalUrlBaseTest+externalUriBaseTest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isConflict())
-                .andReturn();
-    }
-
-    protected void serverErrorByHttpGet(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .get(externalUrlBaseTest+externalUriBaseTest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isInternalServerError())
-                .andReturn();
+    protected HttpComponentsClientHttpRequestFactory httpClientFactory() {
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        return new HttpComponentsClientHttpRequestFactory(httpClient);
     }
 
     /**
-     * Using Http POST
+     * Using Http GET together Rest Template
      */
-    protected void unauthorizedByHttpPost(String uri, String id, String dataRequest) throws Exception {
+    protected void assertRestByGet(String uri, String id, Object body, int expect) throws Exception {
+
+        boolean basicAuth = false;
 
         if (!uri.equals("")) externalUriBaseTest = uri;
         if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
+        if (expect == 401) basicAuth = true;
 
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .post(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalInvalidBasicAuthorization)
-                )
-                .andExpect(status().isUnauthorized())
-                .andReturn();
-    }
+        String url = externalUrlBaseTest + externalUriBaseTest;
+        HttpEntity<?> httpEntity = new HttpEntity<>(body, httpRequestHeaders(basicAuth));
 
-    protected void methodNotAllowedByHttpPost(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .post(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isMethodNotAllowed())
-                .andReturn();
-    }
-
-    protected void badRequestByHttpPost(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .post(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn();
-    }
-
-    protected void okByHttpPost(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .post(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-
-    protected void createdByHttpPost(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .post(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-    }
-
-    protected void acceptedByHttpPost(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .post(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isAccepted())
-                .andReturn();
-    }
-
-    protected void notFoundByHttpPost(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .post(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isNotFound())
-                .andReturn();
-    }
-
-    protected void foundByHttpPost(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .post(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isFound())
-                .andReturn();
-    }
-
-    protected void conflictByHttpPost(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .post(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isConflict())
-                .andReturn();
-    }
-
-    protected void serverErrorByHttpPost(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .post(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isInternalServerError())
-                .andReturn();
+        try {
+            ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Object.class);
+            Assert.assertEquals(response.getStatusCodeValue(), expect);
+        } catch (HttpClientErrorException ex) {
+            Assert.assertEquals(ex.getRawStatusCode(), expect);
+        }
     }
 
     /**
-     * Using Http PUT
+     * Using Http POST together Rest Template
      */
-    protected void unauthorizedByHttpPut(String uri, String id, String dataRequest) throws Exception {
+    protected void assertRestByPost(String uri, String id, Object body, int expect) throws Exception {
+
+        boolean basicAuth = false;
 
         if (!uri.equals("")) externalUriBaseTest = uri;
         if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
+        if (expect == 401) basicAuth = true;
 
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .put(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalInvalidBasicAuthorization)
-                )
-                .andExpect(status().isUnauthorized())
-                .andReturn();
-    }
+        String url = externalUrlBaseTest + externalUriBaseTest;
+        HttpEntity<?> httpEntity = new HttpEntity<>(body, httpRequestHeaders(basicAuth));
 
-    protected void methodNotAllowedByHttpPut(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .put(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isMethodNotAllowed())
-                .andReturn();
-    }
-
-    protected void badRequestByHttpPut(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .put(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn();
-    }
-
-    protected void okByHttpPut(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .put(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-
-    protected void createdByHttpPut(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .put(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-    }
-
-    protected void acceptedByHttpPut(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .put(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isAccepted())
-                .andReturn();
-    }
-
-    protected void notFoundByHttpPut(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .put(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isNotFound())
-                .andReturn();
-    }
-
-    protected void conflictByHttpPut(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .put(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isConflict())
-                .andReturn();
-    }
-
-    protected void serverErrorByHttpPut(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .put(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isInternalServerError())
-                .andReturn();
+        try {
+            ResponseEntity<Object> response = restTemplate.postForEntity(url, httpEntity, Object.class);
+            Assert.assertEquals(response.getStatusCodeValue(), expect);
+        } catch (HttpClientErrorException ex) {
+            Assert.assertEquals(ex.getRawStatusCode(), expect);
+        }
     }
 
     /**
-     * Using Http DELETE
+     * Using Http DELETE together Rest Template
      */
-    protected void unauthorizedByHttpDelete(String uri, String id) throws Exception {
+    protected void assertRestByDelete(String uri, String id, Object body, int expect) throws Exception {
+
+        boolean basicAuth = false;
 
         if (!uri.equals("")) externalUriBaseTest = uri;
         if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
+        if (expect == 401) basicAuth = true;
 
-        mockMvc.perform(
-                MockMvcRequestBuilders
-                        .delete(externalUrlBaseTest+externalUriBaseTest)
-                        .header("Authorization", externalInvalidBasicAuthorization)
-                )
-                .andExpect(status().isUnauthorized())
-                .andReturn();
-    }
+        String url = externalUrlBaseTest + externalUriBaseTest;
+        HttpEntity<?> httpEntity = new HttpEntity<>(body, httpRequestHeaders(basicAuth));
 
-    protected void methodNotAllowedByHttpDelete(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .delete(externalUrlBaseTest+externalUriBaseTest)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isMethodNotAllowed())
-                .andReturn();
-    }
-
-    protected void badRequestByHttpDelete(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .delete(externalUrlBaseTest+externalUriBaseTest)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn();
-    }
-
-    protected void conflictByHttpDelete(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .delete(externalUrlBaseTest+externalUriBaseTest)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isConflict())
-                .andReturn();
-    }
-
-    protected void okByHttpDelete(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .delete(externalUrlBaseTest+externalUriBaseTest)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-
-    protected void acceptedByHttpDelete(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .delete(externalUrlBaseTest+externalUriBaseTest)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isAccepted())
-                .andReturn();
-    }
-
-    protected void notFoundByHttpDelete(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .delete(externalUrlBaseTest+externalUriBaseTest)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isNotFound())
-                .andReturn();
-    }
-
-    protected void serverErrorByHttpDelete(String uri, String id) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .delete(externalUrlBaseTest+externalUriBaseTest)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isInternalServerError())
-                .andReturn();
+        try {
+            ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.DELETE, httpEntity, Object.class);
+            Assert.assertEquals(response.getStatusCodeValue(), expect);
+        } catch (HttpClientErrorException ex) {
+            Assert.assertEquals(ex.getRawStatusCode(), expect);
+        }
     }
 
     /**
-     * Using Http PATCH
+     * Using Http PUT together Rest Template
      */
-    protected void unauthorizedByHttpPatch(String uri, String id, String dataRequest) throws Exception {
+    protected void assertRestByPut(String uri, String id, Object body, int expect) throws Exception {
+
+        boolean basicAuth = false;
 
         if (!uri.equals("")) externalUriBaseTest = uri;
         if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
+        if (expect == 401) basicAuth = true;
 
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .patch(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalInvalidBasicAuthorization)
-                )
-                .andExpect(status().isUnauthorized())
-                .andReturn();
-    }
+        String url = externalUrlBaseTest + externalUriBaseTest;
+        HttpEntity<?> httpEntity = new HttpEntity<>(body, httpRequestHeaders(basicAuth));
 
-    protected void methodNotAllowedByHttpPatch(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .patch(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isMethodNotAllowed())
-                .andReturn();
-    }
-
-    protected void badRequestByHttpPatch(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .patch(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn();
-    }
-
-    protected void okByHttpPatch(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .patch(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-
-    protected void acceptedByHttpPatch(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .patch(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isAccepted())
-                .andReturn();
-    }
-
-    protected void notFoundByHttpPatch(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .patch(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isNotFound())
-                .andReturn();
-    }
-
-    protected void conflictByHttpPatch(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .patch(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isConflict())
-                .andReturn();
-    }
-
-    protected void serverErrorByHttpPatch(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .patch(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isInternalServerError())
-                .andReturn();
+        try {
+            ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.PUT, httpEntity, Object.class);
+            Assert.assertEquals(response.getStatusCodeValue(), expect);
+        } catch (HttpClientErrorException ex) {
+            Assert.assertEquals(ex.getRawStatusCode(), expect);
+        }
     }
 
     /**
-     * Using Http HEAD
+     * Using Http PATCH together Rest Template
      */
-    protected void unauthorizedByHttpHead(String uri, String id, String dataRequest) throws Exception {
+    protected void assertRestByPatch(String uri, String id, Object body, int expect) throws Exception {
+
+        boolean basicAuth = false;
 
         if (!uri.equals("")) externalUriBaseTest = uri;
         if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
+        if (expect == 401) basicAuth = true;
 
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .head(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalInvalidBasicAuthorization)
-                )
-                .andExpect(status().isUnauthorized())
-                .andReturn();
-    }
+        String url = externalUrlBaseTest + externalUriBaseTest;
+        HttpEntity<?> httpEntity = new HttpEntity<>(body, httpRequestHeaders(basicAuth));
 
-    protected void methodNotAllowedByHttpHead(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .head(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isMethodNotAllowed())
-                .andReturn();
-    }
-
-    protected void badRequestByHttpHead(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .head(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn();
-    }
-
-    protected void okByHttpHead(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .head(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-
-    protected void notFoundByHttpHead(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .head(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isNotFound())
-                .andReturn();
-    }
-
-    protected void conflictByHttpHead(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .head(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isConflict())
-                .andReturn();
-    }
-
-    protected void serverErrorByHttpHead(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .head(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isInternalServerError())
-                .andReturn();
+        try {
+            restTemplate.setRequestFactory(httpClientFactory());
+            ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.PATCH, httpEntity, Object.class);
+            Assert.assertEquals(response.getStatusCodeValue(), expect);
+        } catch (HttpClientErrorException ex) {
+            Assert.assertEquals(ex.getRawStatusCode(), expect);
+        }
     }
 
     /**
-     * Using Http OPTIONS
+     * Using Http HEAD together Rest Template
      */
-    protected void unauthorizedByHttpOptions(String uri, String id, String dataRequest) throws Exception {
+    protected void assertRestByHead(String uri, String id, Object body, int expect) throws Exception {
+
+        boolean basicAuth = false;
 
         if (!uri.equals("")) externalUriBaseTest = uri;
         if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
+        if (expect == 401) basicAuth = true;
 
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .options(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalInvalidBasicAuthorization)
-                )
-                .andExpect(status().isUnauthorized())
-                .andReturn();
+        String url = externalUrlBaseTest + externalUriBaseTest;
+        HttpEntity<?> httpEntity = new HttpEntity<>(body, httpRequestHeaders(basicAuth));
+
+        try {
+            ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.HEAD, httpEntity, Object.class);
+            Assert.assertEquals(response.getStatusCodeValue(), expect);
+        } catch (HttpClientErrorException ex) {
+            Assert.assertEquals(ex.getRawStatusCode(), expect);
+        }
     }
 
-    protected void methodNotAllowedByHttpOptions(String uri, String id, String dataRequest) throws Exception {
+    /**
+     * Using Http OPTIONS together Rest Template
+     */
+    protected void assertRestByOptions(String uri, String id, Object body, int expect) throws Exception {
+
+        boolean basicAuth = false;
 
         if (!uri.equals("")) externalUriBaseTest = uri;
         if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
+        if (expect == 401) basicAuth = true;
 
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .options(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isMethodNotAllowed())
-                .andReturn();
-    }
+        String url = externalUrlBaseTest + externalUriBaseTest;
+        HttpEntity<?> httpEntity = new HttpEntity<>(body, httpRequestHeaders(basicAuth));
 
-    protected void badRequestByHttpOptions(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .options(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn();
-    }
-
-    protected void okByHttpOptions(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .options(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-
-    protected void notFoundByHttpOptions(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .options(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isNotFound())
-                .andReturn();
-    }
-
-    protected void conflictByHttpOptions(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .options(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isConflict())
-                .andReturn();
-    }
-
-    protected void serverErrorByHttpOptions(String uri, String id, String dataRequest) throws Exception {
-
-        if (!uri.equals("")) externalUriBaseTest = uri;
-        if (!id.equals("")) externalUriBaseTest = externalUriBaseTest+"/"+id;
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders
-                                .options(externalUrlBaseTest+externalUriBaseTest)
-                                .content(dataRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", externalBasicAuthorization)
-                )
-                .andExpect(status().isInternalServerError())
-                .andReturn();
+        try {
+            ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.OPTIONS, httpEntity, Object.class);
+            Assert.assertEquals(response.getStatusCodeValue(), expect);
+        } catch (HttpClientErrorException ex) {
+            Assert.assertEquals(ex.getRawStatusCode(), expect);
+        }
     }
 
 }

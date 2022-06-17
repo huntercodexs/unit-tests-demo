@@ -20,58 +20,65 @@ public class PatchUserTest extends ExternalAbstractTest {
 
     @Test
     public void whenRequestToPatchUserUnauthorized_RetrieveUnauthorized_401() throws Exception {
-        unauthorizedByHttpPatch(
+        assertRestByPatch(
                 props.getProperty("external.test.patch-user-uri"),
                 props.getProperty("external.test.patch-user-by-id"),
-                props.getProperty("external.test.patch-user-body-correct"));
+                props.getProperty("external.test.patch-user-body-correct"),
+                401);
     }
 
     @Test
     public void whenRequestToPatchUserButWithoutId_RetrieveMissingId_400() throws Exception {
-        badRequestByHttpPatch(
+        assertRestByPatch(
                 props.getProperty("external.test.patch-user-uri"),
                 " ", /*id*/
-                props.getProperty("external.test.patch-user-body-correct"));
+                props.getProperty("external.test.patch-user-body-correct"),
+                400);
     }
 
     @Test
     public void whenRequestToPatchUserButIdIsNotNumber_RetrieveMissingId_400() throws Exception {
-        badRequestByHttpPatch(
+        assertRestByPatch(
                 props.getProperty("external.test.patch-user-uri"),
                 props.getProperty("external.test.patch-user-by-id-non-integer"),
-                props.getProperty("external.test.patch-user-body-correct"));
+                props.getProperty("external.test.patch-user-body-correct"),
+                400);
     }
 
     @Test
     public void whenRequestToPatchUserButIdNotFound_RetrieveMissingId_404() throws Exception {
-        notFoundByHttpPatch(
+        assertRestByPatch(
                 props.getProperty("external.test.patch-user-uri"),
                 props.getProperty("external.test.patch-user-by-id-not-found"),
-                props.getProperty("external.test.patch-user-body-correct"));
+                props.getProperty("external.test.patch-user-body-correct"),
+                404);
     }
 
     @Test
     public void whenRequestToPatchUserUsingInvalidBody_RetrieveConflict_409() throws Exception {
-        conflictByHttpPatch(
+        assertRestByPatch(
                 props.getProperty("external.test.patch-user-uri"),
                 props.getProperty("external.test.patch-user-by-id"),
-                props.getProperty("external.test.patch-user-body-invalid"));
+                props.getProperty("external.test.patch-user-body-invalid"),
+                409);
     }
 
     @Test
     public void whenRequestToPatchUserUsingErrorBody_RetrieveError_400() throws Exception {
-        badRequestByHttpPatch(
+        assertRestByPatch(
                 props.getProperty("external.test.patch-user-uri"),
                 props.getProperty("external.test.patch-user-by-id"),
-                props.getProperty("external.test.patch-user-body-error"));
+                props.getProperty("external.test.patch-user-body-error"),
+                400);
     }
 
     @Test
     public void whenRequestToPatchUserCorrectly_RetrieveUserPatched_200() throws Exception {
-        okByHttpPatch(
+        assertRestByPatch(
                 props.getProperty("external.test.patch-user-uri"),
                 props.getProperty("external.test.patch-user-by-id"),
-                props.getProperty("external.test.patch-user-body-correct"));
+                props.getProperty("external.test.patch-user-body-correct"),
+                200);
     }
 
 }

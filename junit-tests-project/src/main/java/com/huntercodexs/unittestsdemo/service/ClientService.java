@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -39,6 +40,9 @@ public class ClientService {
     @Value("${external.basic-auth}")
     String remoteBasicAuth;
 
+    @Value("${external.basic-auth-invalid}")
+    String remoteBasicAuthInvalid;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     protected HttpHeaders httpRequestHeaders() {
@@ -62,8 +66,8 @@ public class ClientService {
 
         try {
            return restTemplate.exchange(urlFindUserId, HttpMethod.GET, httpEntity, ExternalUserResponseDto.class);
-        } catch (RuntimeException re) {
-            throw new RuntimeException("Error on findUserId: " + re.getMessage());
+        } catch (HttpClientErrorException ex) {
+            return ResponseEntity.status(ex.getRawStatusCode()).build();
         }
 
     }
@@ -77,8 +81,8 @@ public class ClientService {
 
         try {
             return restTemplate.exchange(urlFindUsers, HttpMethod.GET, httpEntity, ExternalUserResponseDto.class);
-        } catch (RuntimeException re) {
-            throw new RuntimeException("Error on findUsers: " + re.getMessage());
+        } catch (HttpClientErrorException ex) {
+            return ResponseEntity.status(ex.getRawStatusCode()).build();
         }
 
     }
@@ -92,8 +96,8 @@ public class ClientService {
 
         try {
             return restTemplate.postForEntity(urlCreateUser, httpEntity, ExternalUserResponseDto.class);
-        } catch (RuntimeException re) {
-            throw new RuntimeException("Error on createUser: " + re.getMessage());
+        } catch (HttpClientErrorException ex) {
+            return ResponseEntity.status(ex.getRawStatusCode()).build();
         }
 
     }
@@ -107,8 +111,8 @@ public class ClientService {
 
         try {
             return restTemplate.exchange(urlDeleteUser, HttpMethod.DELETE, httpEntity, ExternalUserResponseDto.class);
-        } catch (RuntimeException re) {
-            throw new RuntimeException("Error on deleteUser: " + re.getMessage());
+        } catch (HttpClientErrorException ex) {
+            return ResponseEntity.status(ex.getRawStatusCode()).build();
         }
 
     }
@@ -122,8 +126,8 @@ public class ClientService {
 
         try {
             return restTemplate.exchange(urlUpdateUser, HttpMethod.PUT, httpEntity, ExternalUserResponseDto.class);
-        } catch (RuntimeException re) {
-            throw new RuntimeException("Error on update user: " + re.getMessage());
+        } catch (HttpClientErrorException ex) {
+            return ResponseEntity.status(ex.getRawStatusCode()).build();
         }
     }
 
@@ -137,8 +141,8 @@ public class ClientService {
         try {
             restTemplate.setRequestFactory(httpClientFactory());
             return restTemplate.exchange(urlPatchUser, HttpMethod.PATCH, httpEntity, ExternalUserResponseDto.class);
-        } catch (RuntimeException re) {
-            throw new RuntimeException("Error on patch user: " + re.getMessage());
+        } catch (HttpClientErrorException ex) {
+            return ResponseEntity.status(ex.getRawStatusCode()).build();
         }
     }
 

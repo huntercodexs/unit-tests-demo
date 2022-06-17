@@ -64,7 +64,7 @@ public class ExternalAppSimulatorService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("UNAUTHORIZED");
         }
         if (externalUserRequestDto.getName().equals("Username Conflict")) return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        return ResponseEntity.ok().body(ExternalUserResponseMapper.mapperExternalResponseCreateUserDto(externalUserRequestDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ExternalUserResponseMapper.mapperExternalResponseCreateUserDto(externalUserRequestDto));
     }
 
     public ResponseEntity<?> delete(HttpServletRequest headers, Integer id) {
@@ -82,7 +82,7 @@ public class ExternalAppSimulatorService {
         if (id == null) return ResponseEntity.badRequest().build();
         if (id == 0) return ResponseEntity.notFound().build();
         if (!isUpdate(externalUserRequestDto)) return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        return ResponseEntity.ok().body(ExternalUserResponseMapper.mapperExternalResponseUpdateUserDto(externalUserRequestDto));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ExternalUserResponseMapper.mapperExternalResponseUpdateUserDto(externalUserRequestDto));
     }
 
     public ResponseEntity<?> patch(HttpServletRequest headers, Integer id, ExternalUserRequestDto externalUserRequestDto) {
@@ -92,6 +92,6 @@ public class ExternalAppSimulatorService {
         if (id == null) return ResponseEntity.badRequest().build();
         if (id == 0) return ResponseEntity.notFound().build();
         if (!isPatch(externalUserRequestDto)) return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        return ResponseEntity.ok().body(ExternalUserResponseMapper.mapperExternalResponsePatchUserDto(externalUserRequestDto));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ExternalUserResponseMapper.mapperExternalResponsePatchUserDto(externalUserRequestDto));
     }
 }
