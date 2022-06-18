@@ -47,6 +47,10 @@ public abstract class UnitAbstractTest {
         }
     }
 
+    protected void assertionObject(Object obj1, Object obj2) {
+        Assert.assertEquals(obj1, obj2);
+    }
+
     protected void assertionText(String ref, String text) {
         if (text.contains(ref)) {
             Assert.assertEquals(1, 1);
@@ -57,6 +61,10 @@ public abstract class UnitAbstractTest {
 
     protected void assertionBool(boolean val) {
         Assert.assertTrue(val);
+    }
+
+    protected void assertionNullable(Object obj) {
+        Assert.assertNotNull(obj);
     }
 
     protected void assertionNumber(String number) {
